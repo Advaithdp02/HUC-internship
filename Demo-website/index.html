@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Product Dashboard</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="sidebar">
+  <h2>Warehouse</h2>
+  
+</div>
+
+<div class="main">
+  <div class="navbar">
+    <h1>Product Listing</h1>
+    <button class="add-btn" onclick="openAddModal()">+ Add Product</button>
+
+  </div>
+
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Quantity</th>
+          <th>Price</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="productTableBody">
+        <tr>
+          <td>Samsung TV</td>
+          <td>Electronics</td>
+          <td>12</td>
+          <td>₹45,000</td>
+          <td>
+            <button class="action-btn edit" onclick="openEditModal(this)">Edit</button>
+            <button class="action-btn delete" onclick="deleteRow(this)">Delete</button>
+          </td>
+        </tr>
+        <tr>
+          <td>JBL Speaker</td>
+          <td>Audio</td>
+          <td>30</td>
+          <td>₹5,000</td>
+          <td>
+            <button class="action-btn edit" onclick="openEditModal(this)">Edit</button>
+            <button class="action-btn delete" onclick="deleteRow(this)">Delete</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <!-- ADD PRODUCT MODAL -->
+<div id="addModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeAddModal()">&times;</span>
+    <h2>Add Product</h2>
+    <form id="addProductForm">
+      <input type="text" id="name" placeholder="Product Name" required>
+      <input type="text" id="type" placeholder="Type (TV, Speaker...)" required>
+      <input type="number" id="quantity" placeholder="Quantity" required>
+      <input type="number" id="price" placeholder="Price" required>
+      <button type="submit" class="save-btn">Save Product</button>
+    </form>
+  </div>
+</div>
+
+<!-- EDIT PRODUCT MODAL -->
+<div id="editModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeEditModal()">&times;</span>
+    <h2>Edit Product</h2>
+    <form id="editProductForm">
+      <input type="text" id="editName">
+      <input type="text" id="editType">
+      <input type="number" id="editQty">
+      <input type="number" id="editPrice">
+      <button type="submit" class="update-btn">Update Product</button>
+    </form>
+  </div>
+</div>
+<script src="script.js"></script>
+
+</div>  
+</body>
+</html>
