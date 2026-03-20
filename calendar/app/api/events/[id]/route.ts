@@ -5,7 +5,7 @@ import { getUserFromReq } from "@/lib/middleware";
 
 export async function PUT(
   req: Request,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   await connectDB();
 
@@ -14,12 +14,13 @@ export async function PUT(
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
+  const { id } = await context.params;
   const body = await req.json();
 
   const event = await Event.findOneAndUpdate(
-    { _id: params.id, userId: user.id },
+    { _id: id, userId: user.id },
     body,
-    { new: true }
+    { returnDocument: "after" } // ✅ fixed
   );
 
   return NextResponse.json(event);
@@ -27,7 +28,7 @@ export async function PUT(
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   await connectDB();
 
@@ -36,8 +37,10 @@ export async function DELETE(
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
+  const { id } = await context.params;
+
   await Event.findOneAndDelete({
-    _id: params.id,
+    _id: id,
     userId: user.id,
   });
 

@@ -1,28 +1,50 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import API from "@/app/utils/api";
 
-export default function EventModal({ date: initialDate, onClose }: any) {
+export default function EventModal({ event, date: initialDate, onClose }: any) {
+  const isEdit = !!event;
+
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-
-  // If date is passed → use it, else empty
   const [date, setDate] = useState(
     initialDate
       ? new Date(initialDate).toISOString().split("T")[0]
       : ""
   );
 
+  useEffect(() => {
+    if (event) {
+      setTitle(event.title);
+      setDescription(event.description || "");
+      setDate(new Date(event.date).toISOString().split("T")[0]);
+    }
+  }, [event]);
+
   const handleSubmit = async () => {
     if (!title.trim() || !date) return;
 
-    await API.post("/events", {
-      title,
-      description,
-      date,
-    });
+    if (isEdit) {
+      await API.put(`/events/${event._id}`, {
+        title,
+        description,
+        date,
+      });
+    } else {
+      await API.post("/events", {
+        title,
+        description,
+        date,
+      });
+    }
 
+    onClose();
+  };
+
+  const handleDelete = async () => {
+    if (!event) return;
+    await API.delete(`/events/${event._id}`);
     onClose();
   };
 
@@ -35,72 +57,52 @@ export default function EventModal({ date: initialDate, onClose }: any) {
         onClick={(e) => e.stopPropagation()}
         className="bg-white w-[420px] rounded-2xl shadow-xl p-6"
       >
-        {/* Header */}
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold">Add Event</h2>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 text-xl"
-          >
+          <h2 className="text-lg font-semibold">
+            {isEdit ? "Edit Event" : "Add Event"}
+          </h2>
+          <button onClick={onClose} className="text-gray-400 text-xl">
             ✕
           </button>
         </div>
 
-        {/* Title */}
         <input
           placeholder="Event title"
-          className="w-full border border-gray-200 focus:border-[#FA812F] focus:ring-1 focus:ring-[#FA812F] outline-none p-2.5 mb-3 rounded-lg text-sm"
+          className="w-full border p-2 mb-3 rounded"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
         />
 
-        {/* Date Section */}
-        <div className="mb-3">
-          <label className="text-sm text-gray-500 block mb-1">
-            {initialDate ? "Event Date" : "Select Date"}
-          </label>
+        <input
+          type="date"
+          className="w-full border p-2 mb-3 rounded"
+          value={date}
+          onChange={(e) => setDate(e.target.value)}
+        />
 
-          {initialDate ? (
-            // If date is passed → show formatted date (readonly)
-            <div className="p-2.5 border rounded-lg text-sm bg-gray-50">
-              {new Date(date).toDateString()}
-            </div>
-          ) : (
-            // Else → allow picking date
-            <input
-              type="date"
-              className="w-full border border-gray-200 p-2.5 rounded-lg text-sm focus:border-[#FA812F] focus:ring-1 focus:ring-[#FA812F] outline-none"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-            />
-          )}
-        </div>
-
-        {/* Description */}
         <textarea
-          placeholder="Add description..."
-          rows={3}
-          className="w-full border border-gray-200 p-2.5 mb-4 rounded-lg text-sm focus:border-[#FA812F] focus:ring-1 focus:ring-[#FA812F] outline-none resize-none"
+          placeholder="Description"
+          className="w-full border p-2 mb-4 rounded"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
         />
 
-        {/* Actions */}
-        <div className="flex justify-end gap-2">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 rounded-lg text-sm border hover:bg-gray-100 transition"
-          >
-            Cancel
-          </button>
+        <div className="flex justify-between">
+          {isEdit && (
+            <button
+              onClick={handleDelete}
+              className="text-red-500"
+            >
+              Delete
+            </button>
+          )}
 
-          <button
-            onClick={handleSubmit}
-            disabled={!title || !date}
-            className="bg-[#FA812F] hover:bg-[#e56f1f] disabled:opacity-50 text-white px-5 py-2 rounded-lg text-sm font-medium transition"
-          >
-            Save
-          </button>
+          <div className="flex gap-2 ml-auto">
+            <button onClick={onClose}>Cancel</button>
+            <button onClick={handleSubmit}>
+              {isEdit ? "Update" : "Save"}
+            </button>
+          </div>
         </div>
       </div>
     </div>

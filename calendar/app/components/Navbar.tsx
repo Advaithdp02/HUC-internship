@@ -1,20 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import EventModal from "./EventModal"; // adjust path
+import EventModal from "./EventModal";
 
 export default function Navbar() {
   const router = useRouter();
   const [showModal, setShowModal] = useState(false);
+  const [token, setToken] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
 
-  const token =
-    typeof window !== "undefined" && localStorage.getItem("token");
+  useEffect(() => {
+    setMounted(true);
+    setToken(localStorage.getItem("token"));
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
+    setToken(null);
     router.push("/login");
   };
+
+  if (!mounted) return null; // 🚀 prevents hydration mismatch
 
   return (
     <>
@@ -22,7 +29,6 @@ export default function Navbar() {
         <h1 className="text-xl font-semibold">Calendar</h1>
 
         <div className="flex items-center gap-3">
-          {/* Add Event Button */}
           <button
             onClick={() => setShowModal(true)}
             className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition"
@@ -30,7 +36,6 @@ export default function Navbar() {
             + Add Event
           </button>
 
-          {/* Auth */}
           {token ? (
             <button
               onClick={handleLogout}
@@ -49,7 +54,6 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* ✅ Modal Render */}
       {showModal && (
         <EventModal onClose={() => setShowModal(false)} />
       )}

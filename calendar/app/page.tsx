@@ -8,9 +8,12 @@ import API from "./utils/api";
 import dayjs from "dayjs";
 
 export default function Home() {
-  const [selectedDate, setSelectedDate] = useState<any>(null);
   const [events, setEvents] = useState([]);
   const [currentMonth, setCurrentMonth] = useState(dayjs());
+
+  const [showModal, setShowModal] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<any>(null);
+  const [selectedEvent, setSelectedEvent] = useState<any>(null);
 
   const fetchEvents = async () => {
     try {
@@ -33,15 +36,32 @@ export default function Home() {
         events={events}
         currentMonth={currentMonth}
         setCurrentMonth={setCurrentMonth}
-        onDateClick={(date: any) => setSelectedDate(date)}
+
+ 
+        onDateClick={(date: any) => {
+          setSelectedEvent(null);
+          setSelectedDate(date);
+          setShowModal(true);
+        }}
+
+  
+        onEventClick={(event: any) => {
+          setSelectedEvent(event);
+          setSelectedDate(null);
+          setShowModal(true);
+        }}
       />
 
-      {selectedDate && (
+
+      {showModal && (
         <EventModal
+          event={selectedEvent}
           date={selectedDate}
           onClose={() => {
+            setShowModal(false);
             setSelectedDate(null);
-            fetchEvents();
+            setSelectedEvent(null);
+            fetchEvents(); // 🔥 refresh after add/edit/delete
           }}
         />
       )}

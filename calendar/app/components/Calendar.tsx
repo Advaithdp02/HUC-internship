@@ -4,13 +4,13 @@ import dayjs from "dayjs";
 
 export default function Calendar({
   onDateClick,
+  onEventClick,
   events,
   currentMonth,
   setCurrentMonth,
 }: any) {
   const startOfMonth = currentMonth.startOf("month");
   const daysInMonth = currentMonth.daysInMonth();
-
   const startDay = startOfMonth.day();
 
   const daysArray = [];
@@ -27,10 +27,7 @@ export default function Calendar({
 
   return (
     <div className="p-4">
-
-      {/* 🔥 HEADER */}
       <div className="flex items-center justify-between mb-4">
-
         <h2 className="text-2xl font-bold">
           {currentMonth.format("MMMM YYYY")}
         </h2>
@@ -52,14 +49,12 @@ export default function Calendar({
         </div>
       </div>
 
-      {/* WEEK HEADER */}
       <div className="grid grid-cols-7 mb-2 text-center font-semibold">
         {weekDays.map((d) => (
           <div key={d}>{d}</div>
         ))}
       </div>
 
-      {/* GRID */}
       <div className="grid grid-cols-7 gap-2">
         {daysArray.map((day: any, index) => {
           if (!day) return <div key={index}></div>;
@@ -84,11 +79,21 @@ export default function Calendar({
                 {dayEvents.slice(0, 2).map((event: any) => (
                   <div
                     key={event._id}
-                    className="bg-[#FAB12F] text-xs px-1 rounded truncate"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onEventClick(event);
+                    }}
+                    className="bg-[#FAB12F] text-xs px-1 rounded truncate cursor-pointer hover:bg-[#FA812F]"
                   >
                     {event.title}
                   </div>
                 ))}
+
+                {dayEvents.length > 2 && (
+                  <div className="text-xs text-gray-500">
+                    +{dayEvents.length - 2} more
+                  </div>
+                )}
               </div>
             </div>
           );
